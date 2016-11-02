@@ -10,7 +10,7 @@ var PRIORITIES_FOR_FUNCS = {
     'format': 3
 };
 var SELECTED_FIELDS;
-exports.isStar = true;
+exports.isStar = false;
 
 exports.query = function (collection) {
     SELECTED_FIELDS = [];
