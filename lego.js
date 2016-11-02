@@ -9,7 +9,7 @@ var PRIORITIES_FOR_FUNCS = {
     'limit': 3,
     'format': 4
 };
-exports.isStar = false;
+exports.isStar = true;
 
 exports.query = function (collection) {
     var newCollection = collection.map(function (item) {
