@@ -5,15 +5,13 @@ var PRIORITIES_FOR_FUNCS = {
     'or': 0,
     'and': 0,
     'sortBy': 1,
-    'select': 1,
-    'limit': 2,
-    'format': 3
+    'select': 2,
+    'limit': 3,
+    'format': 4
 };
-var SELECTED_FIELDS;
 exports.isStar = false;
 
 exports.query = function (collection) {
-    SELECTED_FIELDS = [];
     var newCollection = collection.map(function (item) {
         return Object.assign({}, item);
     });
@@ -24,15 +22,6 @@ exports.query = function (collection) {
     funcs.forEach(function (func) {
         newCollection = func(newCollection);
     });
-    if (SELECTED_FIELDS.length) {
-        newCollection.forEach(function (people) {
-            Object.getOwnPropertyNames(people).forEach(function (name) {
-                if (SELECTED_FIELDS.indexOf(name) === -1) {
-                    delete people[name];
-                }
-            });
-        });
-    }
 
     return newCollection;
 };
@@ -41,12 +30,22 @@ exports.select = function () {
     var fields = [].slice.call(arguments);
 
     return function select(collection) {
-        fields.forEach(function (field) {
-            if (collection.length > 0 && collection[0].hasOwnProperty(field) &&
-                SELECTED_FIELDS.indexOf(field) === -1) {
-                SELECTED_FIELDS.push(field);
+        fields = fields.reduce(function (currentFields, field) {
+            if (Object.getOwnPropertyNames(collection[0]).indexOf(field) !== -1) {
+                currentFields.push(field);
             }
-        });
+
+            return currentFields;
+        }, []);
+        if (fields.length) {
+            collection.forEach(function (people) {
+                Object.getOwnPropertyNames(people).forEach(function (name) {
+                    if (fields.indexOf(name) === -1) {
+                        delete people[name];
+                    }
+                });
+            });
+        }
 
         return collection;
     };
