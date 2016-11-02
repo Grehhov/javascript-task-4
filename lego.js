@@ -53,14 +53,9 @@ exports.select = function () {
 
 exports.filterIn = function (property, values) {
     return function filterIn(collection) {
-        var newCollection = [];
-        collection.forEach(function (people) {
-            if (values.indexOf(people[property]) !== -1) {
-                newCollection.push(people);
-            }
-        });
-
-        return newCollection;
+        return collection.filter(function (people) {
+            return values.indexOf(people[property]) !== -1;
+        }, []);
     };
 };
 
@@ -102,15 +97,10 @@ if (exports.isStar) {
         var filters = [].slice.call(arguments);
 
         return function or(collection) {
-            return filters.reduce(function (currentFilteredCollection, filter) {
-                var filteredCollection = filter(collection);
-                filteredCollection.forEach(function (item) {
-                    if (currentFilteredCollection.indexOf(item) === -1) {
-                        currentFilteredCollection.push(item);
-                    }
+            return collection.filter(function (people) {
+                return filters.some(function (filter) {
+                    return filter([people]).length === 1;
                 });
-
-                return currentFilteredCollection;
             }, []);
         };
     };
