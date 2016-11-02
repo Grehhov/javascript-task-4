@@ -42,8 +42,8 @@ exports.select = function () {
 
     return function select(collection) {
         fields.forEach(function (field) {
-            if (collection.length > 0 && collection[0].hasOwnProperty(field)
-                && SELECTED_FIELDS.indexOf(field) === -1) {
+            if (collection.length > 0 && collection[0].hasOwnProperty(field) &&
+                SELECTED_FIELDS.indexOf(field) === -1) {
                 SELECTED_FIELDS.push(field);
             }
         });
