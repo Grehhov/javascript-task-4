@@ -43,13 +43,18 @@ exports.select = function () {
 
     return function select(collection) {
         return collection.reduce(function (newCollection, humon) {
-            newCollection.push(fields.reduce(function (newHumon, field) {
+            var newHumon = fields.reduce(function (newHumon, field) {
                 if (Object.keys(humon).indexOf(field) !== -1) {
                     newHumon[field] = humon[field];
                 }
 
                 return newHumon;
-            }, {}));
+            }, {});
+            if (Object.keys(newHumon).length === 0) {
+                newCollection.push(humon);
+            } else {
+                newCollection.push(newHumon);
+            }
 
             return newCollection;
         }, []);
