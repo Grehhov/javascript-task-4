@@ -26,7 +26,7 @@ function copyCollection(collection) {
 exports.query = function (collection) {
     var newCollection = copyCollection(collection);
     var funcs = [].slice.call(arguments, 1);
-    
+
     return funcs
         .sort(function (a, b) {
             return PRIORITIES_FOR_FUNCS[a.name] - PRIORITIES_FOR_FUNCS[b.name];
