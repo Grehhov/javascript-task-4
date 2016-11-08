@@ -43,12 +43,12 @@ exports.select = function () {
 
     return function select(collection) {
         return collection.reduce(function (newCollection, humon) {
-            var newHumon = fields.reduce(function (newHumon, field) {
+            var newHumon = fields.reduce(function (changedHumon, field) {
                 if (Object.keys(humon).indexOf(field) !== -1) {
-                    newHumon[field] = humon[field];
+                    changedHumon[field] = humon[field];
                 }
 
-                return newHumon;
+                return changedHumon;
             }, {});
             if (Object.keys(newHumon).length === 0) {
                 newCollection.push(humon);
