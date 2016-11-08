@@ -121,11 +121,11 @@ if (exports.isStar) {
         var filters = [].slice.call(arguments);
 
         return function and(collection) {
-            return filters.reduce(function (c, filter) {
+            filters.forEach(function (filter) {
                 collection = filter(collection);
+            });
 
-                return collection;
-            }, []);
+            return collection;
         };
     };
 }
