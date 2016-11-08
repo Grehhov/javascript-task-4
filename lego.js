@@ -72,7 +72,13 @@ exports.filterIn = function (property, values) {
 exports.sortBy = function (property, order) {
     return function sortBy(collection) {
         return collection.sort(function (a, b) {
-            var result = a[property] - b[property];
+            var result = 0;
+            if (a[property] > b[property]) {
+                result = 1;
+            }
+            if (a[property] < b[property]) {
+                result = -1;
+            }
 
             return order === 'asc' ? result : -result;
         });
