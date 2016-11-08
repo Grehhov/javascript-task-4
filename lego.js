@@ -40,24 +40,22 @@ exports.select = function () {
     var fields = [].slice.call(arguments);
 
     return function select(collection) {
-        fields = fields.reduce(function (currentFields, field) {
-            if (Object.getOwnPropertyNames(collection[0]).indexOf(field) !== -1) {
-                currentFields.push(field);
+        return collection.reduce(function (newCollection, humon) {
+            var newHumon = fields.reduce(function (newHumon, field) {
+                if (Object.keys(humon).indexOf(field) !== -1) {
+                    newHumon[field] = humon[field];
+                }
+
+                return newHumon;
+            }, {});
+            if (Object.keys(newHumon).length === 0) {
+                newCollection.push(humon);
+            } else {
+                newCollection.push(newHumon);
             }
 
-            return currentFields;
+            return newCollection;
         }, []);
-        if (fields.length) {
-            collection.forEach(function (people) {
-                Object.getOwnPropertyNames(people).forEach(function (name) {
-                    if (fields.indexOf(name) === -1) {
-                        delete people[name];
-                    }
-                });
-            });
-        }
-
-        return collection;
     };
 };
 
@@ -72,13 +70,7 @@ exports.filterIn = function (property, values) {
 exports.sortBy = function (property, order) {
     return function sortBy(collection) {
         return collection.sort(function (a, b) {
-            var result = 0;
-            if (a[property] > b[property]) {
-                result = 1;
-            }
-            if (a[property] < b[property]) {
-                result = -1;
-            }
+            var result = a[property] > b[property] ? 1 : -1;
 
             return order === 'asc' ? result : -result;
         });
@@ -119,11 +111,11 @@ if (exports.isStar) {
         var filters = [].slice.call(arguments);
 
         return function and(collection) {
-            filters.forEach(function (filter) {
+            return filters.reduce(function (c, filter) {
                 collection = filter(collection);
-            });
 
-            return collection;
+                return collection;
+            }, []);
         };
     };
 }
