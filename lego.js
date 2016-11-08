@@ -29,11 +29,12 @@ exports.query = function (collection) {
     funcs = funcs.sort(function (a, b) {
         return PRIORITIES_FOR_FUNCS[a.name] - PRIORITIES_FOR_FUNCS[b.name];
     });
-    funcs.forEach(function (func) {
-        newCollection = func(newCollection);
-    });
 
-    return newCollection;
+    return funcs.reduce(function (c, func) {
+        newCollection = func(newCollection);
+
+        return newCollection;
+    }, []);
 };
 
 exports.select = function () {
