@@ -42,22 +42,24 @@ exports.select = function () {
     var fields = [].slice.call(arguments);
 
     return function select(collection) {
-        return collection.reduce(function (newCollection, humon) {
-            var newHumon = fields.reduce(function (changedHumon, field) {
-                if (Object.keys(humon).indexOf(field) !== -1) {
-                    changedHumon[field] = humon[field];
-                }
-
-                return changedHumon;
-            }, {});
-            if (Object.keys(newHumon).length === 0) {
-                newCollection.push(humon);
-            } else {
-                newCollection.push(newHumon);
+        fields = fields.reduce(function (currentFields, field) {
+            if (Object.getOwnPropertyNames(collection[0]).indexOf(field) !== -1) {
+                currentFields.push(field);
             }
 
-            return newCollection;
+            return currentFields;
         }, []);
+        if (fields.length) {
+            collection.forEach(function (people) {
+                Object.getOwnPropertyNames(people).forEach(function (name) {
+                    if (fields.indexOf(name) === -1) {
+                        delete people[name];
+                    }
+                });
+            });
+        }
+
+        return collection;
     };
 };
 
