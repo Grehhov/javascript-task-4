@@ -113,7 +113,7 @@ if (exports.isStar) {
         var filters = [].slice.call(arguments);
 
         return function and(collection) {
-            return filters.reduce(function (c, filter) {
+            return filters.reduce(function (returnCollection, filter) {
                 collection = filter(collection);
 
                 return collection;
