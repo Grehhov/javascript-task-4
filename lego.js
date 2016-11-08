@@ -33,6 +33,7 @@ exports.query = function (collection) {
         })
         .reduce(function (c, func) {
             newCollection = func(newCollection);
+
             return newCollection;
         }, []);
 };
@@ -109,6 +110,7 @@ if (exports.isStar) {
         return function and(collection) {
             return filters.reduce(function (c, filter) {
                 collection = filter(collection);
+
                 return collection;
             }, []);
         };
