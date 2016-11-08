@@ -11,50 +11,54 @@ var PRIORITIES_FOR_FUNCS = {
 };
 exports.isStar = true;
 
-exports.query = function (collection) {
-    var newCollection = collection.map(function (item) {
-        return Object.assign({}, item);
-    });
-    var funcs = [].slice.call(arguments, 1);
-    funcs = funcs.sort(function (a, b) {
-        return PRIORITIES_FOR_FUNCS[a.name] - PRIORITIES_FOR_FUNCS[b.name];
-    });
-    funcs.forEach(function (func) {
-        newCollection = func(newCollection);
-    });
+function copyCollection(collection) {
+    return collection.reduce(function (copy, humon) {
+        copy.push(Object.keys(humon).reduce(function (copyHumon, key) {
+            copyHumon[key] = humon[key];
 
-    return newCollection;
+            return copyHumon;
+        }, {}));
+
+        return copy;
+    }, []);
+}
+
+exports.query = function (collection) {
+    var newCollection = copyCollection(collection);
+    var funcs = [].slice.call(arguments, 1);
+
+    return funcs
+        .sort(function (a, b) {
+            return PRIORITIES_FOR_FUNCS[a.name] - PRIORITIES_FOR_FUNCS[b.name];
+        })
+        .reduce(function (c, func) {
+            newCollection = func(newCollection);
+            return newCollection;
+        }, []);
 };
 
 exports.select = function () {
     var fields = [].slice.call(arguments);
 
     return function select(collection) {
-        fields = fields.reduce(function (currentFields, field) {
-            if (Object.getOwnPropertyNames(collection[0]).indexOf(field) !== -1) {
-                currentFields.push(field);
-            }
+        return collection.reduce(function (newCollection, humon) {
+            newCollection.push(fields.reduce(function (newHumon, field) {
+                if (Object.keys(humon).indexOf(field) !== -1) {
+                    newHumon[field] = humon[field];
+                }
 
-            return currentFields;
+                return newHumon;
+            }, {}));
+
+            return newCollection;
         }, []);
-        if (fields.length) {
-            collection.forEach(function (people) {
-                Object.getOwnPropertyNames(people).forEach(function (name) {
-                    if (fields.indexOf(name) === -1) {
-                        delete people[name];
-                    }
-                });
-            });
-        }
-
-        return collection;
     };
 };
 
 exports.filterIn = function (property, values) {
     return function filterIn(collection) {
-        return collection.filter(function (people) {
-            return values.indexOf(people[property]) !== -1;
+        return collection.filter(function (humon) {
+            return values.indexOf(humon[property]) !== -1;
         }, []);
     };
 };
@@ -62,13 +66,7 @@ exports.filterIn = function (property, values) {
 exports.sortBy = function (property, order) {
     return function sortBy(collection) {
         return collection.sort(function (a, b) {
-            var result = 0;
-            if (a[property] > b[property]) {
-                result = 1;
-            }
-            if (a[property] < b[property]) {
-                result = -1;
-            }
+            var result = a[property] - b[property];
 
             return order === 'asc' ? result : -result;
         });
@@ -78,8 +76,8 @@ exports.sortBy = function (property, order) {
 exports.format = function (property, formatter) {
 
     return function format(collection) {
-        collection.forEach(function (people) {
-            people[property] = formatter(people[property]);
+        collection.forEach(function (humon) {
+            humon[property] = formatter(humon[property]);
         });
 
         return collection;
@@ -97,9 +95,9 @@ if (exports.isStar) {
         var filters = [].slice.call(arguments);
 
         return function or(collection) {
-            return collection.filter(function (people) {
+            return collection.filter(function (humon) {
                 return filters.some(function (filter) {
-                    return filter([people]).length === 1;
+                    return filter([humon]).length === 1;
                 });
             }, []);
         };
@@ -109,11 +107,10 @@ if (exports.isStar) {
         var filters = [].slice.call(arguments);
 
         return function and(collection) {
-            filters.forEach(function (filter) {
+            return filters.reduce(function (c, filter) {
                 collection = filter(collection);
-            });
-
-            return collection;
+                return collection;
+            }, []);
         };
     };
 }
