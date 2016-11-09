@@ -43,7 +43,7 @@ exports.select = function () {
         return collection.map(function (humon) {
             var newHumon = fields.reduce(function (changedHumon, field) {
                 if (Object.keys(humon).indexOf(field) !== -1) {
-                    Humon[field] = humon[field];
+                    changedHumon[field] = humon[field];
                 }
 
                 return changedHumon;
