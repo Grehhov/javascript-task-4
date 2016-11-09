@@ -11,20 +11,18 @@ var PRIORITIES_FOR_FUNCS = {
 };
 exports.isStar = true;
 
-function copyCollection(collection) {
-    return collection.reduce(function (copy, humon) {
-        copy.push(Object.keys(humon).reduce(function (copyHumon, key) {
-            copyHumon[key] = humon[key];
+function getCopyCollection(collection) {
+    return collection.map(function (object) {
+        return Object.keys(object).reduce(function (copyObject, key) {
+            copyObject[key] = object[key];
 
-            return copyHumon;
-        }, {}));
-
-        return copy;
-    }, []);
+            return copyObject;
+        }, {});
+    });
 }
 
 exports.query = function (collection) {
-    var newCollection = copyCollection(collection);
+    var newCollection = getCopyCollection(collection);
     var funcs = [].slice.call(arguments, 1);
 
     return funcs
@@ -42,22 +40,20 @@ exports.select = function () {
     var fields = [].slice.call(arguments);
 
     return function select(collection) {
-        return collection.reduce(function (newCollection, humon) {
+        return collection.map(function (humon) {
             var newHumon = fields.reduce(function (changedHumon, field) {
                 if (Object.keys(humon).indexOf(field) !== -1) {
-                    changedHumon[field] = humon[field];
+                    Humon[field] = humon[field];
                 }
 
                 return changedHumon;
             }, {});
-            if (Object.keys(newHumon).length === 0) {
-                newCollection.push(humon);
-            } else {
-                newCollection.push(newHumon);
+            if (Object.keys(newHumon).length) {
+                return newHumon;
             }
 
-            return newCollection;
-        }, []);
+            return humon;
+        });
     };
 };
 
